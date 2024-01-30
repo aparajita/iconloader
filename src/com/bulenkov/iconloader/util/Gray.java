@@ -16,13 +16,14 @@
 
 package com.bulenkov.iconloader.util;
 
-import java.awt.*;
+import java.awt.Color;
 
 /**
  * @author Konstantin Bulenkov
  */
-@SuppressWarnings({"InspectionUsingGrayColors", "UnusedDeclaration"})
+@SuppressWarnings({ "InspectionUsingGrayColors", "UnusedDeclaration" })
 public class Gray extends Color {
+
   private Gray(int num) {
     super(num, num, num);
   }
@@ -32,12 +33,16 @@ public class Gray extends Color {
   }
 
   public Color withAlpha(int alpha) {
-    assert 0 <= alpha && alpha <= 255 : "Alpha " + alpha + "is incorrect. Alpha should be in range 0..255";
+    assert 0 <= alpha && alpha <= 255 : "Alpha " +
+    alpha +
+    "is incorrect. Alpha should be in range 0..255";
     return new Gray(getRed(), alpha);
   }
 
   public static Gray get(int gray) {
-    assert 0 <= gray && gray <= 255 : "Gray == " + gray + "Gray should be in range 0..255";
+    assert 0 <= gray && gray <= 255 : "Gray == " +
+    gray +
+    "Gray should be in range 0..255";
     return cache[gray];
   }
 
@@ -559,6 +564,7 @@ public class Gray extends Color {
   public static final Gray xFE = _254;
   public static final Gray xFF = _255;
 
+  // prettier-ignore
   private static final Gray[] cache = {
       _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15,
       _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31,
@@ -576,7 +582,6 @@ public class Gray extends Color {
       _208, _209, _210, _211, _212, _213, _214, _215, _216, _217, _218, _219, _220, _221, _222, _223,
       _224, _225, _226, _227, _228, _229, _230, _231, _232, _233, _234, _235, _236, _237, _238, _239,
       _240, _241, _242, _243, _244, _245, _246, _247, _248, _249, _250, _251, _252, _253, _254, _255};
-
   //public static void main(String[] args) {
   //  for (int i = 0; i < 256; i++) {
   //    System.out.println("public static final Gray _" + i + " = new Gray("+ i + ");");

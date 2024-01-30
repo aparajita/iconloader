@@ -16,23 +16,29 @@
 
 package com.bulenkov.iconloader.util;
 
-import java.awt.*;
+import java.awt.Color;
 
 /**
  * @author Konstantin Bulenkov
  */
 public class ColorUtil {
+
   private static int shift(int colorComponent, double d) {
-    final int n = (int) (colorComponent * d);
-    return n > 255 ? 255 : n < 0 ? 0 : n;
+    final var n = (int) (colorComponent * d);
+    return n > 255 ? 255 : Math.max(n, 0);
   }
 
   public static Color shift(Color c, double d) {
-    return new Color(shift(c.getRed(), d), shift(c.getGreen(), d), shift(c.getBlue(), d), c.getAlpha());
+    return new Color(
+      shift(c.getRed(), d),
+      shift(c.getGreen(), d),
+      shift(c.getBlue(), d),
+      c.getAlpha()
+    );
   }
 
   public static Color toAlpha(Color color, int a) {
-    Color c = color != null ? color : Color.black;
+    var c = color != null ? color : Color.black;
     return new Color(c.getRed(), c.getGreen(), c.getBlue(), a);
   }
 
@@ -50,15 +56,19 @@ public class ColorUtil {
     if (str.startsWith("#")) {
       str = str.substring(1);
     }
+
     if (str.length() == 3) {
       return new Color(
-          17 * Integer.valueOf(String.valueOf(str.charAt(0)), 16),
-          17 * Integer.valueOf(String.valueOf(str.charAt(1)), 16),
-          17 * Integer.valueOf(String.valueOf(str.charAt(2)), 16));
+        17 * Integer.valueOf(String.valueOf(str.charAt(0)), 16),
+        17 * Integer.valueOf(String.valueOf(str.charAt(1)), 16),
+        17 * Integer.valueOf(String.valueOf(str.charAt(2)), 16)
+      );
     } else if (str.length() == 6) {
       return Color.decode("0x" + str);
     } else {
-      throw new IllegalArgumentException("Should be String of 3 or 6 chars length.");
+      throw new IllegalArgumentException(
+        "Should be String of 3 or 6 chars length."
+      );
     }
   }
 
@@ -72,13 +82,18 @@ public class ColorUtil {
 
   /**
    * Checks whether color is dark or not based on perceptional luminosity
-   * http://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
+   * <a href="http://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color">...</a>
    *
    * @param c color to check
    * @return dark or not
    */
   public static boolean isDark(final Color c) {
     // based on perceptional luminosity, see
-    return (1 - (0.299 * c.getRed() + 0.587 * c.getGreen() + 0.114 * c.getBlue()) / 255) >= 0.5;
+    return (
+      (1 -
+        (0.299 * c.getRed() + 0.587 * c.getGreen() + 0.114 * c.getBlue()) /
+          255) >=
+      0.5
+    );
   }
 }

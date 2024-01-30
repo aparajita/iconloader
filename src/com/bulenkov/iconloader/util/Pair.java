@@ -19,16 +19,16 @@ package com.bulenkov.iconloader.util;
 /**
  * @author Konstantin Bulenkov
  */
+@SuppressWarnings("unchecked")
 public class Pair<FIRST, SECOND> {
+
   public final FIRST first;
   public final SECOND second;
 
-  @SuppressWarnings("unchecked")
-  private static final Pair EMPTY = create(null, null);
+  private static final Pair<Object, Object> EMPTY = create(null, null);
 
-  @SuppressWarnings("unchecked")
   public static <F, S> Pair<F, S> empty() {
-    return EMPTY;
+    return (Pair<F, S>) EMPTY;
   }
 
   public Pair(FIRST first, SECOND second) {
@@ -45,13 +45,15 @@ public class Pair<FIRST, SECOND> {
   }
 
   public final boolean equals(Object o) {
-    return o instanceof Pair
-        && ComparingUtils.equal(first, ((Pair) o).first)
-        && ComparingUtils.equal(second, ((Pair) o).second);
+    return (
+      o instanceof Pair &&
+      ComparingUtils.equal(first, ((Pair<?, ?>) o).first) &&
+      ComparingUtils.equal(second, ((Pair<?, ?>) o).second)
+    );
   }
 
   public int hashCode() {
-    int result = first != null ? first.hashCode() : 0;
+    var result = first != null ? first.hashCode() : 0;
     result = 31 * result + (second != null ? second.hashCode() : 0);
     return result;
   }
@@ -61,7 +63,7 @@ public class Pair<FIRST, SECOND> {
   }
 
   public static <F, S> Pair<F, S> create(F first, S second) {
-    return new Pair<F, S>(first, second);
+    return new Pair<>(first, second);
   }
 
   public static <T> T getFirst(Pair<T, ?> pair) {

@@ -15,70 +15,76 @@
  */
 package com.bulenkov.iconloader.util;
 
+import java.awt.Font;
 import javax.swing.plaf.UIResource;
-import java.awt.*;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Konstantin Bulenkov
  */
 public class JBFont extends Font {
-    private JBFont(Font font) {
-        super(font);
+
+  private JBFont(Font font) {
+    super(font);
+  }
+
+  public static JBFont create(Font font) {
+    return create(font, true);
+  }
+
+  public static JBFont create(Font font, boolean tryToScale) {
+    if (font instanceof JBFont) {
+      return ((JBFont) font);
     }
 
-    public static JBFont create(Font font) {
-        return create(font, true);
+    Font scaled = font;
+
+    if (tryToScale) {
+      scaled = font.deriveFont(font.getSize() * JBUI.scale(1f));
     }
 
-    public static JBFont create(Font font, boolean tryToScale) {
-        if (font instanceof JBFont) {
-            return ((JBFont)font);
-        }
-        Font scaled = font;
-        if (tryToScale) {
-            scaled = font.deriveFont(font.getSize() * JBUI.scale(1f));
-        }
-
-        if (font instanceof UIResource) {
-            return new JBFontUIResource(scaled);
-        }
-
-        return new JBFont(scaled);
+    if (font instanceof UIResource) {
+      return new JBFontUIResource(scaled);
     }
 
-    public JBFont asBold() {
-        return deriveFont(BOLD, getSize());
-    }
+    return new JBFont(scaled);
+  }
 
-    public JBFont asItalic() {
-        return deriveFont(ITALIC, getSize());
-    }
+  public JBFont asBold() {
+    return deriveFont(BOLD, getSize());
+  }
 
-    public JBFont asPlain() {
-        return deriveFont(PLAIN, getSize());
-    }
+  public JBFont asItalic() {
+    return deriveFont(ITALIC, getSize());
+  }
 
-    @Override
-    public JBFont deriveFont(int style, float size) {
-        return create(super.deriveFont(style, size), false);
-    }
+  public JBFont asPlain() {
+    return deriveFont(PLAIN, getSize());
+  }
 
-    @Override
-    public JBFont deriveFont(float size) {
-        return create(super.deriveFont(size), false);
-    }
+  @Override
+  public JBFont deriveFont(int style, float size) {
+    return create(super.deriveFont(style, size), false);
+  }
 
-    public JBFont biggerOn(float size) {
-        return deriveFont(getSize() + JBUI.scale(size));
-    }
+  @NotNull
+  @Override
+  public JBFont deriveFont(float size) {
+    return create(super.deriveFont(size), false);
+  }
 
-    public JBFont lessOn(float size) {
-        return deriveFont(getSize() - JBUI.scale(size));
-    }
+  public JBFont biggerOn(float size) {
+    return deriveFont(getSize() + JBUI.scale(size));
+  }
 
-    private static class JBFontUIResource extends JBFont implements UIResource {
-        private JBFontUIResource(Font font) {
-            super(font);
-        }
+  public JBFont lessOn(float size) {
+    return deriveFont(getSize() - JBUI.scale(size));
+  }
+
+  private static class JBFontUIResource extends JBFont implements UIResource {
+
+    private JBFontUIResource(Font font) {
+      super(font);
     }
+  }
 }

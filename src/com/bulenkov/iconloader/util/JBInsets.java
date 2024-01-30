@@ -15,107 +15,114 @@
  */
 package com.bulenkov.iconloader.util;
 
-import javax.swing.plaf.UIResource;
-import java.awt.*;
-
 import static com.bulenkov.iconloader.util.JBUI.scale;
+
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import javax.swing.plaf.UIResource;
 
 /**
  * @author Konstantin Bulenkov
  */
 public class JBInsets extends Insets {
-    /**
-     * Creates and initializes a new <code>Insets</code> object with the
-     * specified top, left, bottom, and right insets.
-     *
-     * @param top    the inset from the top.
-     * @param left   the inset from the left.
-     * @param bottom the inset from the bottom.
-     * @param right  the inset from the right.
-     */
-    public JBInsets(int top, int left, int bottom, int right) {
-        super(scale(top), scale(left), scale(bottom), scale(right));
+
+  /**
+   * Creates and initializes a new <code>Insets</code> object with the
+   * specified top, left, bottom, and right insets.
+   *
+   * @param top    the inset from the top.
+   * @param left   the inset from the left.
+   * @param bottom the inset from the bottom.
+   * @param right  the inset from the right.
+   */
+  public JBInsets(int top, int left, int bottom, int right) {
+    super(scale(top), scale(left), scale(bottom), scale(right));
+  }
+
+  public int width() {
+    return left + right;
+  }
+
+  public int height() {
+    return top + bottom;
+  }
+
+  public static JBInsets create(Insets insets) {
+    if (insets instanceof JBInsets) {
+      var copy = new JBInsets(0, 0, 0, 0);
+      copy.top = insets.top;
+      copy.left = insets.left;
+      copy.bottom = insets.bottom;
+      copy.right = insets.right;
+      return copy;
     }
 
-    public int width() {
-        return left + right;
-    }
+    return new JBInsets(insets.top, insets.left, insets.bottom, insets.right);
+  }
 
-    public int height() {
-        return top + bottom;
-    }
+  public JBInsetsUIResource asUIResource() {
+    return new JBInsetsUIResource(this);
+  }
 
-    public static JBInsets create(Insets insets) {
-        if (insets instanceof JBInsets) {
-            JBInsets copy = new JBInsets(0, 0, 0, 0);
-            copy.top = insets.top;
-            copy.left = insets.left;
-            copy.bottom = insets.bottom;
-            copy.right = insets.right;
-            return copy;
-        }
-        return new JBInsets(insets.top, insets.left, insets.bottom, insets.right);
-    }
+  public static class JBInsetsUIResource
+    extends JBInsets
+    implements UIResource {
 
-    public JBInsetsUIResource asUIResource() {
-        return new JBInsetsUIResource(this);
+    public JBInsetsUIResource(JBInsets insets) {
+      super(0, 0, 0, 0);
+      top = insets.top;
+      left = insets.left;
+      bottom = insets.bottom;
+      right = insets.right;
     }
+  }
 
-    public static class JBInsetsUIResource extends JBInsets implements UIResource {
-        public JBInsetsUIResource(JBInsets insets) {
-            super(0, 0, 0, 0);
-            top = insets.top;
-            left = insets.left;
-            bottom = insets.bottom;
-            right = insets.right;
-        }
+  /**
+   * @param dimension the size to increase
+   * @param insets    the insets to add
+   */
+  public static void addTo(Dimension dimension, Insets insets) {
+    if (insets != null) {
+      dimension.width += insets.left + insets.right;
+      dimension.height += insets.top + insets.bottom;
     }
+  }
 
-    /**
-     * @param dimension the size to increase
-     * @param insets    the insets to add
-     */
-    public static void addTo(Dimension dimension, Insets insets) {
-        if (insets != null) {
-            dimension.width += insets.left + insets.right;
-            dimension.height += insets.top + insets.bottom;
-        }
+  /**
+   * @param dimension the size to decrease
+   * @param insets    the insets to remove
+   */
+  public static void removeFrom(Dimension dimension, Insets insets) {
+    if (insets != null) {
+      dimension.width -= insets.left + insets.right;
+      dimension.height -= insets.top + insets.bottom;
     }
+  }
 
-    /**
-     * @param dimension the size to decrease
-     * @param insets    the insets to remove
-     */
-    public static void removeFrom(Dimension dimension, Insets insets) {
-        if (insets != null) {
-            dimension.width -= insets.left + insets.right;
-            dimension.height -= insets.top + insets.bottom;
-        }
+  /**
+   * @param rectangle the size to increase and the location to move
+   * @param insets    the insets to add
+   */
+  public static void addTo(Rectangle rectangle, Insets insets) {
+    if (insets != null) {
+      rectangle.x -= insets.left;
+      rectangle.y -= insets.top;
+      rectangle.width += insets.left + insets.right;
+      rectangle.height += insets.top + insets.bottom;
     }
+  }
 
-    /**
-     * @param rectangle the size to increase and the location to move
-     * @param insets    the insets to add
-     */
-    public static void addTo(Rectangle rectangle, Insets insets) {
-        if (insets != null) {
-            rectangle.x -= insets.left;
-            rectangle.y -= insets.top;
-            rectangle.width += insets.left + insets.right;
-            rectangle.height += insets.top + insets.bottom;
-        }
+  /**
+   * @param rectangle the size to decrease and the location to move
+   * @param insets    the insets to remove
+   */
+  public static void removeFrom(Rectangle rectangle, Insets insets) {
+    if (insets != null) {
+      rectangle.x += insets.left;
+      rectangle.y += insets.top;
+      rectangle.width -= insets.left + insets.right;
+      rectangle.height -= insets.top + insets.bottom;
     }
-
-    /**
-     * @param rectangle the size to decrease and the location to move
-     * @param insets    the insets to remove
-     */
-    public static void removeFrom(Rectangle rectangle, Insets insets) {
-        if (insets != null) {
-            rectangle.x += insets.left;
-            rectangle.y += insets.top;
-            rectangle.width -= insets.left + insets.right;
-            rectangle.height -= insets.top + insets.bottom;
-        }
-    }
+  }
 }

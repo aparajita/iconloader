@@ -19,9 +19,10 @@ package com.bulenkov.iconloader.util;
 /**
  * @author Konstantin Bulenkov
  */
-public class BufferExposingByteArrayOutputStream extends AsyncByteArrayOutputStream {
-  public BufferExposingByteArrayOutputStream() {
-  }
+public class BufferExposingByteArrayOutputStream
+  extends AsyncByteArrayOutputStream {
+
+  public BufferExposingByteArrayOutputStream() {}
 
   public BufferExposingByteArrayOutputStream(int size) {
     super(size);

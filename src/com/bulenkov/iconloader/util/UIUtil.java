@@ -16,36 +16,53 @@
 
 package com.bulenkov.iconloader.util;
 
-import com.bulenkov.iconloader.IsRetina;
 import com.bulenkov.iconloader.JBHiDPIScaledImage;
 import com.bulenkov.iconloader.RetinaImage;
-import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
-import java.lang.reflect.Field;
+import javax.swing.GrayFilter;
+import javax.swing.JComponent;
+import javax.swing.UIManager;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Konstantin Bulenkov
  */
 public class UIUtil {
+
   public static final Color TRANSPARENT_COLOR = new Color(0, 0, 0, 0);
   private static volatile Pair<String, Integer> ourSystemFontData;
   public static final float DEF_SYSTEM_FONT_SIZE = 12f; // TODO: consider 12 * 1.33 to compensate JDK's 72dpi font scale
 
-  public static <T extends JComponent> T findComponentOfType(JComponent parent, Class<T> cls) {
+  public static <T extends JComponent> T findComponentOfType(
+    JComponent parent,
+    Class<T> cls
+  ) {
     if (parent == null || cls.isAssignableFrom(parent.getClass())) {
-      @SuppressWarnings({"unchecked"}) final T t = (T) parent;
+      @SuppressWarnings({ "unchecked" })
+      final var t = (T) parent;
       return t;
     }
-    for (Component component : parent.getComponents()) {
+
+    for (var component : parent.getComponents()) {
       if (component instanceof JComponent) {
-        T comp = findComponentOfType((JComponent) component, cls);
-        if (comp != null) return comp;
+        var comp = findComponentOfType((JComponent) component, cls);
+
+        if (comp != null) {
+          return comp;
+        }
       }
     }
+
     return null;
   }
 
@@ -55,10 +72,12 @@ public class UIUtil {
   }
 
   public static <T> T getParentOfType(Class<? extends T> cls, Component c) {
-    Component eachParent = c;
+    var eachParent = c;
+
     while (eachParent != null) {
       if (cls.isAssignableFrom(eachParent.getClass())) {
-        @SuppressWarnings({"unchecked"}) final T t = (T) eachParent;
+        @SuppressWarnings({ "unchecked" })
+        final T t = (T) eachParent;
         return t;
       }
 
@@ -66,10 +85,6 @@ public class UIUtil {
     }
 
     return null;
-  }
-
-  public static boolean isAppleRetina() {
-    return isRetina() && SystemInfo.isAppleJvm;
   }
 
   public static Color getControlColor() {
@@ -108,14 +123,19 @@ public class UIUtil {
     return UIManager.getColor("Tree.foreground");
   }
 
-  private static final Color DECORATED_ROW_BG_COLOR = new DoubleColor(new Color(242, 245, 249), new Color(65, 69, 71));
+  private static final Color DECORATED_ROW_BG_COLOR = new DoubleColor(
+    new Color(242, 245, 249),
+    new Color(65, 69, 71)
+  );
 
   public static Color getDecoratedRowColor() {
     return DECORATED_ROW_BG_COLOR;
   }
 
   public static Color getTreeSelectionBackground(boolean focused) {
-    return focused ? getTreeSelectionBackground() : getTreeUnfocusedSelectionBackground();
+    return focused
+      ? getTreeSelectionBackground()
+      : getTreeUnfocusedSelectionBackground();
   }
 
   private static Color getTreeSelectionBackground() {
@@ -123,22 +143,37 @@ public class UIUtil {
   }
 
   public static Color getTreeUnfocusedSelectionBackground() {
-    Color background = getTreeTextBackground();
-    return ColorUtil.isDark(background) ? new DoubleColor(Gray._30, new Color(13, 41, 62)) : Gray._212;
+    var background = getTreeTextBackground();
+    return ColorUtil.isDark(background)
+      ? new DoubleColor(Gray._30, new Color(13, 41, 62))
+      : Gray._212;
   }
 
   public static Color getTreeTextBackground() {
     return UIManager.getColor("Tree.textBackground");
   }
 
-  public static void drawImage(Graphics g, Image image, int x, int y, ImageObserver observer) {
+  public static void drawImage(
+    Graphics g,
+    Image image,
+    int x,
+    int y,
+    ImageObserver observer
+  ) {
     if (image instanceof JBHiDPIScaledImage) {
-      final Graphics2D newG = (Graphics2D) g.create(x, y, image.getWidth(observer), image.getHeight(observer));
+      final var newG = (Graphics2D) g.create(
+        x,
+        y,
+        image.getWidth(observer),
+        image.getHeight(observer)
+      );
       newG.scale(0.5, 0.5);
       Image img = ((JBHiDPIScaledImage) image).getDelegate();
+
       if (img == null) {
         img = image;
       }
+
       newG.drawImage(img, 0, 0, observer);
       newG.scale(1, 1);
       newG.dispose();
@@ -147,36 +182,28 @@ public class UIUtil {
     }
   }
 
-
-  private static final Ref<Boolean> ourRetina = Ref.create(SystemInfo.isMac ? null : false);
+  private static final Ref<Boolean> ourRetina = Ref.create(
+    SystemInfo.isMac ? null : false
+  );
 
   public static boolean isRetina() {
     synchronized (ourRetina) {
       if (ourRetina.isNull()) {
         ourRetina.set(false); // in case HiDPIScaledImage.drawIntoImage is not called for some reason
 
-        if (SystemInfo.isJavaVersionAtLeast("1.6.0_33") && SystemInfo.isAppleJvm) {
-          if (!"false".equals(System.getProperty("ide.mac.retina"))) {
-            ourRetina.set(IsRetina.isRetina());
-            return ourRetina.get();
-          }
-        } else if (SystemInfo.isJavaVersionAtLeast("1.7.0_40") && (SystemInfo.isOracleJvm || SystemInfo.isJetbrainsJvm)) {
-          GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-          final GraphicsDevice device = env.getDefaultScreenDevice();
-          try {
-            Field field = device.getClass().getDeclaredField("scale");
-            if (field != null) {
-              field.setAccessible(true);
-              Object scale = field.get(device);
-              if (scale instanceof Integer && (Integer) scale == 2) {
-                ourRetina.set(true);
-                return true;
-              }
-            }
-          } catch (Exception ignore) {
+        if (SystemInfo.isJavaVersionAtLeast("1.7.0_40")) {
+          var env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+          final var device = env.getDefaultScreenDevice();
+          var scale = device
+            .getDefaultConfiguration()
+            .getDefaultTransform()
+            .getScaleX();
+
+          if (scale == 2) {
+            ourRetina.set(true);
+            return true;
           }
         }
-        ourRetina.set(false);
       }
 
       return ourRetina.get();
@@ -187,13 +214,19 @@ public class UIUtil {
     if (isRetina()) {
       return RetinaImage.create(width, height, type);
     }
+
     //noinspection UndesirableClassUsage
     return new BufferedImage(width, height, type);
   }
 
-
-  private static final GrayFilter DEFAULT_GRAY_FILTER = new GrayFilter(true, 65);
-  private static final GrayFilter DARCULA_GRAY_FILTER = new GrayFilter(true, 30);
+  private static final GrayFilter DEFAULT_GRAY_FILTER = new GrayFilter(
+    true,
+    65
+  );
+  private static final GrayFilter DARCULA_GRAY_FILTER = new GrayFilter(
+    true,
+    30
+  );
 
   public static GrayFilter getGrayFilter() {
     return isUnderDarcula() ? DARCULA_GRAY_FILTER : DEFAULT_GRAY_FILTER;
@@ -204,32 +237,36 @@ public class UIUtil {
   }
 
   public static float getFontSize(FontSize size) {
-    int defSize = getLabelFont().getSize();
-    switch (size) {
-      case SMALL:
-        return Math.max(defSize - JBUI.scale(2f), JBUI.scale(11f));
-      case MINI:
-        return Math.max(defSize - JBUI.scale(4f), JBUI.scale(9f));
-      default:
-        return defSize;
-    }
+    var defSize = getLabelFont().getSize();
+
+    return switch (size) {
+      case SMALL -> Math.max(defSize - JBUI.scale(2f), JBUI.scale(11f));
+      case MINI -> Math.max(defSize - JBUI.scale(4f), JBUI.scale(9f));
+      default -> defSize;
+    };
   }
 
-  public enum FontSize {NORMAL, SMALL, MINI}
+  public enum FontSize {
+    NORMAL,
+    SMALL,
+    MINI,
+  }
 
   public static void initSystemFontData() {
-    if (ourSystemFontData != null) return;
+    if (ourSystemFontData != null) {
+      return;
+    }
 
     // With JB Linux JDK the label font comes properly scaled based on Xft.dpi settings.
-    Font font = getLabelFont();
-
+    var font = getLabelFont();
     Float forcedScale = null;
+
     if (Registry.is("ide.ui.scale.override")) {
       forcedScale = Registry.getFloat("ide.ui.scale");
-    }
-    else if (SystemInfo.isLinux && !SystemInfo.isJetbrainsJvm) {
+    } else if (SystemInfo.isLinux) {
       // With Oracle JDK: derive scale from X server DPI
-      float scale = getScreenScale();
+      var scale = getScreenScale();
+
       if (scale > 1f) {
         forcedScale = scale;
       }
@@ -238,34 +275,46 @@ public class UIUtil {
       // if it's not, then IDEA will start unscaled. This lets the users of GTK DEs
       // not to bother about X server DPI settings. Users of other DEs (like KDE)
       // will have to set X server DPI to meet their display.
-    }
-    else if (SystemInfo.isWindows) {
+    } else if (SystemInfo.isWindows) {
       //noinspection HardCodedStringLiteral
-      Font winFont = (Font)Toolkit.getDefaultToolkit().getDesktopProperty("win.messagebox.font");
+      var winFont = (Font) Toolkit
+        .getDefaultToolkit()
+        .getDesktopProperty("win.messagebox.font");
+
       if (winFont != null) {
         font = winFont; // comes scaled
       }
     }
+
     if (forcedScale != null) {
       // With forced scale, we derive font from a hard-coded value as we cannot be sure
       // the system font comes unscaled.
-      font = font.deriveFont(DEF_SYSTEM_FONT_SIZE * forcedScale.floatValue());
+      font = font.deriveFont(DEF_SYSTEM_FONT_SIZE * forcedScale);
     }
+
     ourSystemFontData = Pair.create(font.getName(), font.getSize());
   }
 
   private static float getScreenScale() {
-    int dpi = 96;
+    var dpi = 96;
+
     try {
       dpi = Toolkit.getDefaultToolkit().getScreenResolution();
-    } catch (HeadlessException e) {
+    } catch (HeadlessException ignored) {}
+
+    float scale;
+
+    if (dpi < 120) {
+      scale = 1f;
+    } else if (dpi < 144) {
+      scale = 1.25f;
+    } else if (dpi < 168) {
+      scale = 1.5f;
+    } else if (dpi < 192) {
+      scale = 1.75f;
+    } else {
+      scale = 2f;
     }
-    float scale = 1f;
-    if (dpi < 120) scale = 1f;
-    else if (dpi < 144) scale = 1.25f;
-    else if (dpi < 168) scale = 1.5f;
-    else if (dpi < 192) scale = 1.75f;
-    else scale = 2f;
 
     return scale;
   }

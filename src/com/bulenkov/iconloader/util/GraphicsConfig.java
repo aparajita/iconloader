@@ -16,7 +16,9 @@
 
 package com.bulenkov.iconloader.util;
 
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.util.Map;
 
 /**
@@ -25,15 +27,21 @@ import java.util.Map;
 public class GraphicsConfig {
 
   private final Graphics2D myG;
-  private final Map myHints;
+  private final Map<Object, Object> myHints;
 
   public GraphicsConfig(Graphics g) {
     myG = (Graphics2D) g;
-    myHints = (Map) myG.getRenderingHints().clone();
+    //noinspection unchecked
+    myHints = (Map<Object, Object>) myG.getRenderingHints().clone();
   }
 
   public GraphicsConfig setAntialiasing(boolean on) {
-    myG.setRenderingHint(RenderingHints.KEY_ANTIALIASING, on ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
+    myG.setRenderingHint(
+      RenderingHints.KEY_ANTIALIASING,
+      on
+        ? RenderingHints.VALUE_ANTIALIAS_ON
+        : RenderingHints.VALUE_ANTIALIAS_OFF
+    );
     return this;
   }
 

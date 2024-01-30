@@ -20,8 +20,9 @@ package com.bulenkov.iconloader.util;
  * @author Konstantin Bulenkov
  */
 public class Registry {
+
   public static boolean is(String key) {
-    final String value = System.getProperty(key);
+    final var value = System.getProperty(key);
     return "true".equalsIgnoreCase(value);
   }
 

@@ -20,10 +20,10 @@ package com.bulenkov.iconloader.util;
  * @author Konstantin Bulenkov
  */
 public class Ref<T> {
+
   private T myValue;
 
-  public Ref() {
-  }
+  public Ref() {}
 
   public Ref(T value) {
     myValue = value;
@@ -46,15 +46,16 @@ public class Ref<T> {
       myValue = value;
       return true;
     }
+
     return false;
   }
 
   public static <V> Ref<V> create() {
-    return new Ref<V>();
+    return new Ref<>();
   }
 
   public static <V> Ref<V> create(V value) {
-    return new Ref<V>(value);
+    return new Ref<>(value);
   }
 
   @Override

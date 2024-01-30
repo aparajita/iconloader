@@ -16,10 +16,7 @@
 
 package com.bulenkov.iconloader;
 
-import com.bulenkov.iconloader.util.SystemInfo;
-import com.bulenkov.iconloader.util.UIUtil;
-
-import java.awt.*;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 
@@ -45,44 +42,35 @@ public class RetinaImage {
    * The raw image should be provided in the specified scale.
    * The wrapper will represent the raw image in the user coordinate space.
    *
-   * @param image the raw image
-   * @param scale the raw image scale
+   * @param image    the raw image
+   * @param scale    the raw image scale
    * @param observer the raw image observer
    * @return the Retina-aware wrapper
    */
-  public static Image createFrom(Image image, final int scale, ImageObserver observer) {
-    int w = image.getWidth(observer);
-    int h = image.getHeight(observer);
-
-    Image hidpi = create(image, w / scale, h / scale, BufferedImage.TYPE_INT_ARGB);
-    if (SystemInfo.isAppleJvm) {
-      Graphics2D g = (Graphics2D)hidpi.getGraphics();
-      g.scale(1f / scale, 1f / scale);
-      g.drawImage(image, 0, 0, null);
-      g.dispose();
-    }
-
-    return hidpi;
+  public static Image createFrom(
+    Image image,
+    final int scale,
+    ImageObserver observer
+  ) {
+    var w = image.getWidth(observer);
+    var h = image.getHeight(observer);
+    return create(image, w / scale, h / scale, BufferedImage.TYPE_INT_ARGB);
   }
 
   public static BufferedImage create(final int width, int height, int type) {
     return create(null, width, height, type);
   }
 
-
-  private static BufferedImage create(Image image, final int width, int height, int type) {
-    if (SystemInfo.isAppleJvm) {
-      return AppleHiDPIScaledImage.create(width, height, type);
+  private static BufferedImage create(
+    Image image,
+    final int width,
+    int height,
+    int type
+  ) {
+    if (image == null) {
+      return new JBHiDPIScaledImage(width, height, type);
     } else {
-      if (image == null) {
-        return new JBHiDPIScaledImage(width, height, type);
-      } else {
-        return new JBHiDPIScaledImage(image, width, height, type);
-      }
+      return new JBHiDPIScaledImage(image, width, height, type);
     }
-  }
-
-  public static boolean isAppleHiDPIScaledImage(Image image) {
-    return UIUtil.isAppleRetina() && AppleHiDPIScaledImage.is(image);
   }
 }

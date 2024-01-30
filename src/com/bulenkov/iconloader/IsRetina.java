@@ -18,13 +18,13 @@ package com.bulenkov.iconloader;
 
 import apple.awt.CImage;
 import com.bulenkov.iconloader.util.Ref;
-
 import java.awt.image.BufferedImage;
 
 /**
  * @author Konstantin Bulenkov
  */
 public class IsRetina {
+
   public static boolean isRetina() {
     try {
       final Ref<Boolean> isRetina = Ref.create(false);
@@ -42,4 +42,3 @@ public class IsRetina {
     }
   }
 }
-

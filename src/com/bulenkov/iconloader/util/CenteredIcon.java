@@ -16,13 +16,15 @@
 
 package com.bulenkov.iconloader.util;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Graphics;
+import javax.swing.Icon;
 
 /**
  * @author Konstantin Bulenkov
  */
 public class CenteredIcon implements Icon {
+
   private final Icon myIcon;
 
   private final int myWidth;
@@ -38,7 +40,12 @@ public class CenteredIcon implements Icon {
     this(icon, width, height, true);
   }
 
-  public CenteredIcon(Icon icon, int width, int height, boolean centeredInComponent) {
+  public CenteredIcon(
+    Icon icon,
+    int width,
+    int height,
+    boolean centeredInComponent
+  ) {
     myIcon = icon;
     myWidth = width;
     myHight = height;
@@ -51,7 +58,7 @@ public class CenteredIcon implements Icon {
     int offsetY;
 
     if (myCenteredInComponent) {
-      final Dimension size = c.getSize();
+      final var size = c.getSize();
       offsetX = size.width / 2 - myIcon.getIconWidth() / 2;
       offsetY = size.height / 2 - myIcon.getIconHeight() / 2;
     } else {

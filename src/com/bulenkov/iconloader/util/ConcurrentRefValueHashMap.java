@@ -16,13 +16,16 @@
 
 package com.bulenkov.iconloader.util;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.TestOnly;
-
 import java.lang.ref.ReferenceQueue;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 
 /**
  * Base class for concurrent strong key:K -> (soft/weak) value:V map
@@ -30,8 +33,9 @@ import java.util.concurrent.ConcurrentMap;
  * Null values are NOT allowed
  */
 abstract class ConcurrentRefValueHashMap<K, V> implements ConcurrentMap<K, V> {
+
   private final ConcurrentMap<K, ValueReference<K, V>> myMap;
-  protected final ReferenceQueue<V> myQueue = new ReferenceQueue<V>();
+  protected final ReferenceQueue<V> myQueue = new ReferenceQueue<>();
 
   public ConcurrentRefValueHashMap(@NotNull Map<K, V> map) {
     this();
@@ -39,19 +43,17 @@ abstract class ConcurrentRefValueHashMap<K, V> implements ConcurrentMap<K, V> {
   }
 
   public ConcurrentRefValueHashMap() {
-    myMap = new ConcurrentHashMap<K, ValueReference<K, V>>();
+    myMap = new ConcurrentHashMap<>();
   }
 
-  public ConcurrentRefValueHashMap(int initialCapacity, float loadFactor, int concurrencyLevel) {
-    myMap = new ConcurrentHashMap<K, ValueReference<K, V>>(initialCapacity, loadFactor, concurrencyLevel);
+  public ConcurrentRefValueHashMap(
+    int initialCapacity,
+    float loadFactor,
+    int concurrencyLevel
+  ) {
+    myMap =
+      new ConcurrentHashMap<>(initialCapacity, loadFactor, concurrencyLevel);
   }
-
-//  public ConcurrentRefValueHashMap(int initialCapacity,
-//                                   float loadFactor,
-//                                   int concurrencyLevel,
-//                                   @NotNull TObjectHashingStrategy<K> hashingStrategy) {
-//    myMap = new ConcurrentHashMap<K, ValueReference<K, V>>(initialCapacity, loadFactor, concurrencyLevel, hashingStrategy);
-//  }
 
   protected interface ValueReference<K, V> {
     @NotNull
@@ -61,48 +63,60 @@ abstract class ConcurrentRefValueHashMap<K, V> implements ConcurrentMap<K, V> {
   }
 
   // returns true if some refs were tossed
-  boolean processQueue() {
-    boolean processed = false;
+  void processQueue() {
+    var processed = false;
 
     while (true) {
       @SuppressWarnings("unchecked")
-      ValueReference<K, V> ref = (ValueReference<K, V>)myQueue.poll();
-      if (ref == null) break;
+      var ref = (ValueReference<K, V>) myQueue.poll();
+
+      if (ref == null) {
+        break;
+      }
+
       myMap.remove(ref.getKey(), ref);
-      processed = true;
     }
-    return processed;
   }
 
   @Override
   public V get(@NotNull Object key) {
-    ValueReference<K, V> ref = myMap.get(key);
-    if (ref == null) return null;
-    return ref.get();
+    var ref = myMap.get(key);
+    return ref == null ? null : ref.get();
   }
 
   @Override
   public V put(@NotNull K key, @NotNull V value) {
     processQueue();
-    ValueReference<K, V> oldRef = myMap.put(key, createValueReference(key, value));
+    var oldRef = myMap.put(key, createValueReference(key, value));
+
     return oldRef != null ? oldRef.get() : null;
   }
 
   @NotNull
-  protected abstract ValueReference<K, V> createValueReference(@NotNull K key, @NotNull V value);
+  protected abstract ValueReference<K, V> createValueReference(
+    @NotNull K key,
+    @NotNull V value
+  );
 
   @Override
   public V putIfAbsent(@NotNull K key, @NotNull V value) {
-    ValueReference<K, V> newRef = createValueReference(key, value);
+    var newRef = createValueReference(key, value);
+
     while (true) {
       processQueue();
-      ValueReference<K, V> oldRef = myMap.putIfAbsent(key, newRef);
-      if (oldRef == null) return null;
-      final V oldVal = oldRef.get();
-      if (oldVal == null) {
-        if (myMap.replace(key, oldRef, newRef)) return null;
+      var oldRef = myMap.putIfAbsent(key, newRef);
+
+      if (oldRef == null) {
+        return null;
       }
-      else {
+
+      final var oldVal = oldRef.get();
+
+      if (oldVal == null) {
+        if (myMap.replace(key, oldRef, newRef)) {
+          return null;
+        }
+      } else {
         return oldVal;
       }
     }
@@ -112,19 +126,27 @@ abstract class ConcurrentRefValueHashMap<K, V> implements ConcurrentMap<K, V> {
   public boolean remove(@NotNull final Object key, @NotNull Object value) {
     processQueue();
     //noinspection unchecked
-    return myMap.remove(key, createValueReference((K)key, (V)value));
+    return myMap.remove(key, createValueReference((K) key, (V) value));
   }
 
   @Override
-  public boolean replace(@NotNull final K key, @NotNull final V oldValue, @NotNull final V newValue) {
+  public boolean replace(
+    @NotNull final K key,
+    @NotNull final V oldValue,
+    @NotNull final V newValue
+  ) {
     processQueue();
-    return myMap.replace(key, createValueReference(key, oldValue), createValueReference(key, newValue));
+    return myMap.replace(
+      key,
+      createValueReference(key, oldValue),
+      createValueReference(key, newValue)
+    );
   }
 
   @Override
   public V replace(@NotNull final K key, @NotNull final V value) {
     processQueue();
-    ValueReference<K, V> ref = myMap.replace(key, createValueReference(key, value));
+    var ref = myMap.replace(key, createValueReference(key, value));
     return ref == null ? null : ref.get();
   }
 
@@ -138,10 +160,12 @@ abstract class ConcurrentRefValueHashMap<K, V> implements ConcurrentMap<K, V> {
   @Override
   public void putAll(@NotNull Map<? extends K, ? extends V> t) {
     processQueue();
-    for (Entry<? extends K, ? extends V> entry : t.entrySet()) {
-      V v = entry.getValue();
+
+    for (var entry : t.entrySet()) {
+      var v = entry.getValue();
+
       if (v != null) {
-        K key = entry.getKey();
+        var key = entry.getKey();
         put(key, v);
       }
     }
@@ -184,47 +208,55 @@ abstract class ConcurrentRefValueHashMap<K, V> implements ConcurrentMap<K, V> {
   @NotNull
   @Override
   public Collection<V> values() {
-    Collection<V> result = new ArrayList<V>();
-    final Collection<ValueReference<K, V>> refs = myMap.values();
+    var result = new ArrayList<V>();
+    final var refs = myMap.values();
+
     for (ValueReference<K, V> ref : refs) {
-      final V value = ref.get();
+      final var value = ref.get();
+
       if (value != null) {
         result.add(value);
       }
     }
+
     return result;
   }
 
   @NotNull
   @Override
   public Set<Entry<K, V>> entrySet() {
-    final Set<K> keys = keySet();
-    Set<Entry<K, V>> entries = new HashSet<Entry<K, V>>();
+    final var keys = keySet();
+    var entries = new HashSet<Entry<K, V>>();
 
     for (final K key : keys) {
-      final V value = get(key);
+      final var value = get(key);
+
       if (value != null) {
-        entries.add(new Entry<K, V>() {
-          @Override
-          public K getKey() {
-            return key;
-          }
+        entries.add(
+          new Entry<>() {
+            @Override
+            public K getKey() {
+              return key;
+            }
 
-          @Override
-          public V getValue() {
-            return value;
-          }
+            @Override
+            public V getValue() {
+              return value;
+            }
 
-          @Override
-          public V setValue(@NotNull V value) {
-            throw new UnsupportedOperationException("setValue is not implemented");
-          }
+            @Override
+            public V setValue(@NotNull V value) {
+              throw new UnsupportedOperationException(
+                "setValue is not implemented"
+              );
+            }
 
-          @Override
-          public String toString() {
-            return "(" + getKey() + " : " + getValue() + ")";
+            @Override
+            public String toString() {
+              return "(" + getKey() + " : " + getValue() + ")";
+            }
           }
-        });
+        );
       }
     }
 

@@ -16,36 +16,44 @@
 
 package com.bulenkov.iconloader.util;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Concurrent strong key:K -> soft value:V map
  * Null keys are NOT allowed
  * Null values are NOT allowed
  */
-public final class ConcurrentSoftValueHashMap<K,V> extends ConcurrentRefValueHashMap<K,V> {
+public final class ConcurrentSoftValueHashMap<K, V>
+  extends ConcurrentRefValueHashMap<K, V> {
+
   public ConcurrentSoftValueHashMap(@NotNull Map<K, V> map) {
     super(map);
   }
 
-  public ConcurrentSoftValueHashMap() {
-  }
+  public ConcurrentSoftValueHashMap() {}
 
-  public ConcurrentSoftValueHashMap(int initialCapacity, float loadFactor, int concurrencyLevel) {
+  public ConcurrentSoftValueHashMap(
+    int initialCapacity,
+    float loadFactor,
+    int concurrencyLevel
+  ) {
     super(initialCapacity, loadFactor, concurrencyLevel);
   }
 
-//  public ConcurrentSoftValueHashMap(int initialCapacity, float loadFactor, int concurrencyLevel, @NotNull TObjectHashingStrategy<K> hashingStrategy) {
-//    super(initialCapacity, loadFactor, concurrencyLevel, hashingStrategy);
-//  }
+  private static class MySoftReference<K, V>
+    extends SoftReference<V>
+    implements ValueReference<K, V> {
 
-  private static class MySoftReference<K, V> extends SoftReference<V> implements ValueReference<K, V> {
     private final K key;
-    private MySoftReference(@NotNull K key, @NotNull V referent, @NotNull ReferenceQueue<V> q) {
+
+    private MySoftReference(
+      @NotNull K key,
+      @NotNull V referent,
+      @NotNull ReferenceQueue<V> q
+    ) {
       super(referent, q);
       this.key = key;
     }
@@ -59,21 +67,29 @@ public final class ConcurrentSoftValueHashMap<K,V> extends ConcurrentRefValueHas
     // When referent is collected, equality should be identity-based (for the processQueues() remove this very same SoftValue)
     // otherwise it's just canonical equals on referents for replace(K,V,V) to work
     public final boolean equals(final Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
+      if (this == o) {
+        return true;
+      }
+
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
 
       @SuppressWarnings("unchecked")
-      ValueReference<K,V> that = (ValueReference)o;
+      var that = (ValueReference<K, V>) o;
 
-      V v = get();
-      V thatV = that.get();
-      return key.equals(that.getKey()) && v != null && thatV != null && v.equals(thatV);
+      var v = get();
+      var thatV = that.get();
+      return key.equals(that.getKey()) && v != null && v.equals(thatV);
     }
   }
 
   @NotNull
   @Override
-  protected ValueReference<K, V> createValueReference(@NotNull K key, @NotNull V value) {
-    return new MySoftReference<K,V>(key, value, myQueue);
+  protected ValueReference<K, V> createValueReference(
+    @NotNull K key,
+    @NotNull V value
+  ) {
+    return new MySoftReference<>(key, value, myQueue);
   }
 }

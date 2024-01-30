@@ -17,19 +17,18 @@
 package com.bulenkov.iconloader;
 
 import apple.awt.CImage;
-
-import java.awt.*;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 /**
  * @author Konstantin Bulenkov
  */
 public class AppleHiDPIScaledImage {
+
   public static BufferedImage create(int width, int height, int imageType) {
     return new CImage.HiDPIScaledImage(width, height, imageType) {
       @Override
-      protected void drawIntoImage(BufferedImage image, float scale) {
-      }
+      protected void drawIntoImage(BufferedImage image, float scale) {}
     };
   }
 

@@ -16,13 +16,15 @@
 
 package com.bulenkov.iconloader;
 
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 /**
  * @author Konstantin Bulenkov
  */
 public class JBHiDPIScaledImage extends BufferedImage {
+
   private final Image myImage;
 
   public JBHiDPIScaledImage(int width, int height, int type) {

@@ -16,11 +16,11 @@
 
 package com.bulenkov.iconloader.util;
 
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Image;
+import javax.swing.ImageIcon;
 import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.ImageObserver;
 
 /**
  * HiDPI-aware image icon
@@ -28,14 +28,19 @@ import java.awt.image.ImageObserver;
  * @author Konstantin Bulenkov
  */
 public class JBImageIcon extends ImageIcon {
+
   public JBImageIcon(@NotNull Image image) {
     super(image);
   }
 
   @Override
-  public synchronized void paintIcon(final Component c, final Graphics g, final int x, final int y) {
-    final ImageObserver observer = getImageObserver();
-
+  public synchronized void paintIcon(
+    final Component c,
+    final Graphics g,
+    final int x,
+    final int y
+  ) {
+    final var observer = getImageObserver();
     UIUtil.drawImage(g, getImage(), x, y, observer == null ? c : observer);
   }
 }

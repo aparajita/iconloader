@@ -17,8 +17,20 @@
 package com.bulenkov.iconloader;
 
 import com.bulenkov.iconloader.util.GraphicsUtil;
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
@@ -34,11 +46,10 @@ import java.util.Map;
  * @author Konstantin Bulenkov
  */
 class HiDPIScaledGraphics extends Graphics2D {
+
   protected final Graphics2D myPeer;
-  private BufferedImage myImage;
 
   public HiDPIScaledGraphics(Graphics g, BufferedImage image) {
-    myImage = image;
     myPeer = (Graphics2D) g;
     scale(2, 2);
     GraphicsUtil.setupAAPainting(myPeer);
@@ -60,7 +71,11 @@ class HiDPIScaledGraphics extends Graphics2D {
   }
 
   @Override
-  public boolean drawImage(Image img, AffineTransform xform, ImageObserver obs) {
+  public boolean drawImage(
+    Image img,
+    AffineTransform xform,
+    ImageObserver obs
+  ) {
     return myPeer.drawImage(img, xform, obs);
   }
 
@@ -95,7 +110,11 @@ class HiDPIScaledGraphics extends Graphics2D {
   }
 
   @Override
-  public void drawString(AttributedCharacterIterator iterator, float x, float y) {
+  public void drawString(
+    AttributedCharacterIterator iterator,
+    float x,
+    float y
+  ) {
     myPeer.drawString(iterator, x, y);
   }
 
@@ -241,8 +260,7 @@ class HiDPIScaledGraphics extends Graphics2D {
 
   @Override
   public Graphics create() {
-    Graphics g = myPeer.create();
-    return g;
+    return myPeer.create();
   }
 
   @Override
@@ -341,12 +359,26 @@ class HiDPIScaledGraphics extends Graphics2D {
   }
 
   @Override
-  public void drawRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight) {
+  public void drawRoundRect(
+    int x,
+    int y,
+    int width,
+    int height,
+    int arcWidth,
+    int arcHeight
+  ) {
     myPeer.drawRoundRect(x, y, width, height, arcWidth, arcHeight);
   }
 
   @Override
-  public void fillRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight) {
+  public void fillRoundRect(
+    int x,
+    int y,
+    int width,
+    int height,
+    int arcWidth,
+    int arcHeight
+  ) {
     myPeer.fillRoundRect(x, y, width, height, arcWidth, arcHeight);
   }
 
@@ -361,42 +393,51 @@ class HiDPIScaledGraphics extends Graphics2D {
   }
 
   @Override
-  public void drawArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
+  public void drawArc(
+    int x,
+    int y,
+    int width,
+    int height,
+    int startAngle,
+    int arcAngle
+  ) {
     myPeer.drawArc(x, y, width, height, startAngle, arcAngle);
   }
 
   @Override
-  public void fillArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
+  public void fillArc(
+    int x,
+    int y,
+    int width,
+    int height,
+    int startAngle,
+    int arcAngle
+  ) {
     myPeer.fillArc(x, y, width, height, startAngle, arcAngle);
   }
 
   @Override
   public void drawPolyline(int[] xPoints, int[] yPoints, int nPoints) {
-
     myPeer.drawPolyline(xPoints, yPoints, nPoints);
   }
 
   @Override
   public void drawPolygon(int[] xPoints, int[] yPoints, int nPoints) {
-
     myPeer.drawPolygon(xPoints, yPoints, nPoints);
   }
 
   @Override
   public void drawPolygon(Polygon p) {
-
     myPeer.drawPolygon(p);
   }
 
   @Override
   public void fillPolygon(int[] xPoints, int[] yPoints, int nPoints) {
-
     myPeer.fillPolygon(xPoints, yPoints, nPoints);
   }
 
   @Override
   public void fillPolygon(Polygon p) {
-
     myPeer.fillPolygon(p);
   }
 
@@ -416,38 +457,95 @@ class HiDPIScaledGraphics extends Graphics2D {
   }
 
   @Override
-  public boolean drawImage(Image img, int x, int y, int width, int height, ImageObserver observer) {
+  public boolean drawImage(
+    Image img,
+    int x,
+    int y,
+    int width,
+    int height,
+    ImageObserver observer
+  ) {
     return myPeer.drawImage(img, x, y, width, height, observer);
   }
 
   @Override
-  public boolean drawImage(Image img, int x, int y, Color bgcolor, ImageObserver observer) {
+  public boolean drawImage(
+    Image img,
+    int x,
+    int y,
+    Color bgcolor,
+    ImageObserver observer
+  ) {
     return myPeer.drawImage(img, x, y, bgcolor, observer);
   }
 
   @Override
-  public boolean drawImage(Image img, int x, int y, int width, int height, Color bgcolor, ImageObserver observer) {
+  public boolean drawImage(
+    Image img,
+    int x,
+    int y,
+    int width,
+    int height,
+    Color bgcolor,
+    ImageObserver observer
+  ) {
     return myPeer.drawImage(img, x, y, width, height, bgcolor, observer);
   }
 
   @Override
-  public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, ImageObserver observer) {
-    return myPeer.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, observer);
+  public boolean drawImage(
+    Image img,
+    int dx1,
+    int dy1,
+    int dx2,
+    int dy2,
+    int sx1,
+    int sy1,
+    int sx2,
+    int sy2,
+    ImageObserver observer
+  ) {
+    return myPeer.drawImage(
+      img,
+      dx1,
+      dy1,
+      dx2,
+      dy2,
+      sx1,
+      sy1,
+      sx2,
+      sy2,
+      observer
+    );
   }
 
   @Override
-  public boolean drawImage(Image img,
-                           int dx1,
-                           int dy1,
-                           int dx2,
-                           int dy2,
-                           int sx1,
-                           int sy1,
-                           int sx2,
-                           int sy2,
-                           Color bgcolor,
-                           ImageObserver observer) {
-    return myPeer.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, bgcolor, observer);
+  public boolean drawImage(
+    Image img,
+    int dx1,
+    int dy1,
+    int dx2,
+    int dy2,
+    int sx1,
+    int sy1,
+    int sx2,
+    int sy2,
+    Color bgcolor,
+    ImageObserver observer
+  ) {
+    return myPeer.drawImage(
+      img,
+      dx1,
+      dy1,
+      dx2,
+      dy2,
+      sx1,
+      sy1,
+      sx2,
+      sy2,
+      bgcolor,
+      observer
+    );
   }
 
   @Override
@@ -456,19 +554,8 @@ class HiDPIScaledGraphics extends Graphics2D {
   }
 
   @Override
-  public void finalize() {
-    myPeer.finalize();
-  }
-
-  @Override
   public String toString() {
     return myPeer.toString();
-  }
-
-  @Override
-  @Deprecated
-  public Rectangle getClipRect() {
-    return myPeer.getClipRect();
   }
 
   @Override
@@ -480,5 +567,4 @@ class HiDPIScaledGraphics extends Graphics2D {
   public Rectangle getClipBounds(Rectangle r) {
     return myPeer.getClipBounds(r);
   }
-
 }

@@ -21,16 +21,17 @@ import java.util.Collection;
 /**
  * @author Konstantin Bulenkov
  */
-@SuppressWarnings({"UtilityClassWithoutPrivateConstructor", "SSBasedInspection"})
+@SuppressWarnings({ "UtilityClassWithoutPrivateConstructor" })
 public class ArrayUtilRt {
+
   private static final int ARRAY_COPY_THRESHOLD = 20;
 
   public static final String[] EMPTY_STRING_ARRAY = new String[0];
 
-
   public static String[] toStringArray(Collection<String> collection) {
     return collection == null || collection.isEmpty()
-        ? EMPTY_STRING_ARRAY : toArray(collection, new String[collection.size()]);
+      ? EMPTY_STRING_ARRAY
+      : toArray(collection, new String[collection.size()]);
   }
 
   /**
@@ -39,12 +40,15 @@ public class ArrayUtilRt {
    */
 
   public static <T> T[] toArray(Collection<T> c, T[] sample) {
-    final int size = c.size();
+    var size = c.size();
+
     if (size == sample.length && size < ARRAY_COPY_THRESHOLD) {
-      int i = 0;
-      for (T t : c) {
+      var i = 0;
+
+      for (var t : c) {
         sample[i++] = t;
       }
+
       return sample;
     }
 
@@ -60,8 +64,9 @@ public class ArrayUtilRt {
    * these elements.
    */
   public static <T> int find(final T[] src, final T obj) {
-    for (int i = 0; i < src.length; i++) {
+    for (var i = 0; i < src.length; i++) {
       final T o = src[i];
+
       if (o == null) {
         if (obj == null) {
           return i;
@@ -72,6 +77,7 @@ public class ArrayUtilRt {
         }
       }
     }
+
     return -1;
   }
 }

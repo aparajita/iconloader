@@ -16,10 +16,15 @@
 
 package com.bulenkov.iconloader;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.HeadlessException;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 
 public class IconLoaderDemoFrame extends JFrame {
+
   public static void main(String[] args) {
     new IconLoaderDemoFrame();
   }
@@ -27,13 +32,19 @@ public class IconLoaderDemoFrame extends JFrame {
   public IconLoaderDemoFrame() throws HeadlessException {
     super("IconLoader Demo");
     setSize(300, 100);
-    final JPanel panel = new JPanel(new BorderLayout());
+    final var panel = new JPanel(new BorderLayout());
     getContentPane().add(panel);
-    JPanel bottom = new JPanel(new BorderLayout());
+    var bottom = new JPanel(new BorderLayout());
     panel.add(bottom, BorderLayout.SOUTH);
-    JButton disabledButton = new JButton("Print disabled", IconLoader.getIcon("/icons/print.png"));
+    var disabledButton = new JButton(
+      "Print disabled",
+      IconLoader.getIcon("/icons/print.png", IconLoaderDemoFrame.class)
+    );
     disabledButton.setEnabled(false);
-    JButton enabledButton = new JButton("Print enabled", IconLoader.getIcon("/icons/print.png"));
+    var enabledButton = new JButton(
+      "Print enabled",
+      IconLoader.getIcon("/icons/print.png", IconLoaderDemoFrame.class)
+    );
     bottom.add(disabledButton, BorderLayout.WEST);
     bottom.add(enabledButton, BorderLayout.EAST);
 

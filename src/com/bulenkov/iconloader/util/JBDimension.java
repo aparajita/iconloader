@@ -16,53 +16,56 @@
 
 package com.bulenkov.iconloader.util;
 
+import java.awt.Dimension;
 import javax.swing.plaf.UIResource;
-import java.awt.*;
 
 /**
  * @author Konstantin Bulenkov
  */
 public class JBDimension extends Dimension {
-    public final float originalScale = JBUI.scale(1f);
 
-    public JBDimension(int width, int height) {
-        super(scale(width), scale(height));
-    }
+  public final float originalScale = JBUI.scale(1f);
 
-    private static int scale(int size) {
-        return size == -1 ? -1 : JBUI.scale(size);
-    }
+  public JBDimension(int width, int height) {
+    super(scale(width), scale(height));
+  }
 
-    public static JBDimension create(Dimension from) {
-        if (from instanceof JBDimension) {
-            return ((JBDimension)from);
-        }
-        return new JBDimension(from.width, from.height);
-    }
+  private static int scale(int size) {
+    return size == -1 ? -1 : JBUI.scale(size);
+  }
 
-    public JBDimensionUIResource asUIResource() {
-        return new JBDimensionUIResource(this);
-    }
+  public static JBDimension create(Dimension from) {
+    return from instanceof JBDimension
+      ? ((JBDimension) from)
+      : new JBDimension(from.width, from.height);
+  }
 
-    public static class JBDimensionUIResource extends JBDimension implements UIResource {
-        public JBDimensionUIResource(JBDimension size) {
-            super(0, 0);
-            width = size.width;
-            height = size.height;
-        }
-    }
+  public JBDimensionUIResource asUIResource() {
+    return new JBDimensionUIResource(this);
+  }
 
-    public JBDimension withWidth(int width) {
-        JBDimension size = new JBDimension(0, 0);
-        size.width = scale(width);
-        size.height = height;
-        return size;
-    }
+  public static class JBDimensionUIResource
+    extends JBDimension
+    implements UIResource {
 
-    public JBDimension withHeight(int height) {
-        JBDimension size = new JBDimension(0, 0);
-        size.width = width;
-        size.height = scale(height);
-        return size;
+    public JBDimensionUIResource(JBDimension size) {
+      super(0, 0);
+      width = size.width;
+      height = size.height;
     }
+  }
+
+  public JBDimension withWidth(int width) {
+    var size = new JBDimension(0, 0);
+    size.width = scale(width);
+    size.height = height;
+    return size;
+  }
+
+  public JBDimension withHeight(int height) {
+    var size = new JBDimension(0, 0);
+    size.width = width;
+    size.height = scale(height);
+    return size;
+  }
 }

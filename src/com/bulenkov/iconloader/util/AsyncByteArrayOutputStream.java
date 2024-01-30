@@ -19,11 +19,13 @@ package com.bulenkov.iconloader.util;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Konstantin Bulenkov
  */
 public class AsyncByteArrayOutputStream extends OutputStream {
+
   protected byte[] myBuffer;
   protected int myCount;
 
@@ -37,7 +39,7 @@ public class AsyncByteArrayOutputStream extends OutputStream {
 
   @Override
   public void write(int b) {
-    int count = myCount + 1;
+    var count = myCount + 1;
 
     if (count > myBuffer.length) {
       myBuffer = Arrays.copyOf(myBuffer, Math.max(myBuffer.length << 1, count));
@@ -48,15 +50,20 @@ public class AsyncByteArrayOutputStream extends OutputStream {
   }
 
   @Override
-  public void write(byte b[], int off, int len) {
-    if ((off < 0) || (off > b.length) || (len < 0) ||
-        ((off + len) > b.length) || ((off + len) < 0)) {
+  public void write(@NotNull byte[] b, int off, int len) {
+    if (
+      (off < 0) ||
+      (off > b.length) ||
+      (len < 0) ||
+      ((off + len) > b.length) ||
+      ((off + len) < 0)
+    ) {
       throw new IndexOutOfBoundsException();
     } else if (len == 0) {
       return;
     }
 
-    int count = myCount + len;
+    var count = myCount + len;
 
     if (count > myBuffer.length) {
       myBuffer = Arrays.copyOf(myBuffer, Math.max(myBuffer.length << 1, count));

@@ -16,24 +16,28 @@
 
 package com.bulenkov.iconloader.util;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.Icon;
 
 /**
  * @author Konstantin Bulenkov
  */
 public class EmptyIcon implements Icon {
-  private static final Map<Integer, Icon> cache = new HashMap<Integer, Icon>();
+
+  private static final Map<Integer, Icon> cache = new HashMap<>();
   private final int width;
   private final int height;
 
   public static Icon create(int size) {
-    Icon icon = cache.get(size);
+    var icon = cache.get(size);
+
     if (icon == null && size < 129) {
       cache.put(size, icon = new EmptyIcon(size, size));
     }
+
     return icon == null ? new EmptyIcon(size, size) : icon;
   }
 
@@ -45,23 +49,9 @@ public class EmptyIcon implements Icon {
     return create(base.getIconWidth(), base.getIconHeight());
   }
 
-  /**
-   * @deprecated use {@linkplain #create(int)} for caching.
-   */
-  public EmptyIcon(int size) {
-    this(size, size);
-  }
-
   public EmptyIcon(int width, int height) {
     this.width = width;
     this.height = height;
-  }
-
-  /**
-   * @deprecated use {@linkplain #create(javax.swing.Icon)} for caching.
-   */
-  public EmptyIcon(Icon base) {
-    this(base.getIconWidth(), base.getIconHeight());
   }
 
   public int getIconWidth() {
@@ -72,21 +62,22 @@ public class EmptyIcon implements Icon {
     return height;
   }
 
-  public void paintIcon(Component component, Graphics g, int i, int j) {
-  }
+  public void paintIcon(Component component, Graphics g, int i, int j) {}
 
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof EmptyIcon)) return false;
+    if (this == o) {
+      return true;
+    }
 
-    final EmptyIcon icon = (EmptyIcon) o;
+    if (!(o instanceof EmptyIcon icon)) {
+      return false;
+    }
 
     return height == icon.height && width == icon.width;
-
   }
 
   public int hashCode() {
-    int sum = width + height;
-    return sum * (sum + 1) / 2 + width;
+    var sum = width + height;
+    return (sum * (sum + 1)) / 2 + width;
   }
 }

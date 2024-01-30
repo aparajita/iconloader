@@ -20,6 +20,8 @@ package com.bulenkov.iconloader.util;
  * @author Konstantin Bulenkov
  */
 public class Base64Converter {
+
+  // prettier-ignore
   private static final char[] alphabet = {
       'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',   //  0 to  7
       'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',   //  8 to 15
@@ -30,6 +32,7 @@ public class Base64Converter {
       'w', 'x', 'y', 'z', '0', '1', '2', '3',   // 48 to 55
       '4', '5', '6', '7', '8', '9', '+', '/'};  // 56 to 63
 
+  // prettier-ignore
   private static final byte[] decodeTable = {
       -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
       -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -58,8 +61,8 @@ public class Base64Converter {
 
     char[] out = new char[((octetString.length - 1) / 3 + 1) * 4];
 
-    int outIndex = 0;
-    int i = 0;
+    var outIndex = 0;
+    var i = 0;
 
     while ((i + 3) <= octetString.length) {
       // store the octets
@@ -105,7 +108,7 @@ public class Base64Converter {
       out[outIndex] = '=';
     }
 
-    return StringFactory.createShared(out);
+    return new String(out);
   }
 
   public static String decode(String s) {
@@ -113,10 +116,10 @@ public class Base64Converter {
   }
 
   public static byte[] decode(byte[] bytes) {
-    int paddingCount = 0;
-    int realLength = 0;
+    var paddingCount = 0;
+    var realLength = 0;
 
-    for (int i = bytes.length - 1; i >= 0; i--) {
+    for (var i = bytes.length - 1; i >= 0; i--) {
       if (bytes[i] > ' ') {
         realLength++;
       }
@@ -127,16 +130,18 @@ public class Base64Converter {
     }
 
     if (realLength % 4 != 0) {
-      throw new IllegalArgumentException("Incorrect length " + realLength + ". Must be a multiple of 4");
+      throw new IllegalArgumentException(
+        "Incorrect length " + realLength + ". Must be a multiple of 4"
+      );
     }
 
-    final byte[] out = new byte[realLength / 4 * 3 - paddingCount];
-    final byte[] t = new byte[4];
-    int outIndex = 0;
-    int index = 0;
+    final var out = new byte[(realLength / 4) * 3 - paddingCount];
+    final var t = new byte[4];
+    var outIndex = 0;
+    var index = 0;
     t[0] = t[1] = t[2] = t[3] = '=';
 
-    for (byte c : bytes) {
+    for (var c : bytes) {
       if (c > ' ') {
         t[index++] = c;
       }
@@ -151,29 +156,54 @@ public class Base64Converter {
     if (index > 0) {
       decode(out, outIndex, t[0], t[1], t[2], t[3]);
     }
+
     return out;
   }
 
-  private static int decode(byte[] output, int outIndex, byte a, byte b, byte c, byte d) {
+  private static int decode(
+    byte[] output,
+    int outIndex,
+    byte a,
+    byte b,
+    byte c,
+    byte d
+  ) {
     byte da = decodeTable[a];
     byte db = decodeTable[b];
     byte dc = decodeTable[c];
     byte dd = decodeTable[d];
 
-    if ((da == -1) || (db == -1) || ((dc == -1) && (c != '=')) || ((dd == -1) && (d != '='))) {
+    if (
+      (da == -1) ||
+      (db == -1) ||
+      ((dc == -1) && (c != '=')) ||
+      ((dd == -1) && (d != '='))
+    ) {
       throw new IllegalArgumentException(
-          "Invalid character [" + (a & 0xFF) + ", " + (b & 0xFF) + ", " + (c & 0xFF) + ", " + (d & 0xFF) + "]");
+        "Invalid character [" +
+        (a & 0xFF) +
+        ", " +
+        (b & 0xFF) +
+        ", " +
+        (c & 0xFF) +
+        ", " +
+        (d & 0xFF) +
+        "]"
+      );
     }
-    output[outIndex++] = (byte) ((da << 2) | db >>> 4);
+
+    output[outIndex++] = (byte) ((da << 2) | (db >>> 4));
 
     if (c == '=') {
       return 1;
     }
-    output[outIndex++] = (byte) ((db << 4) | dc >>> 2);
+
+    output[outIndex++] = (byte) ((db << 4) | (dc >>> 2));
 
     if (d == '=') {
       return 2;
     }
+
     output[outIndex] = (byte) ((dc << 6) | dd);
     return 3;
   }

@@ -17,31 +17,38 @@
 package com.bulenkov.iconloader.util;
 
 import com.bulenkov.iconloader.JBHiDPIScaledImage;
-import org.jetbrains.annotations.NotNull;
-
-import java.awt.*;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Konstantin Bulenkov
  */
 public class ImageUtil {
+
   public static BufferedImage toBufferedImage(@NotNull Image image) {
     if (image instanceof JBHiDPIScaledImage) {
-      Image img = ((JBHiDPIScaledImage)image).getDelegate();
+      Image img = ((JBHiDPIScaledImage) image).getDelegate();
+
       if (img != null) {
         image = img;
       }
     }
+
     if (image instanceof BufferedImage) {
-      return (BufferedImage)image;
+      return (BufferedImage) image;
     }
 
     @SuppressWarnings("UndesirableClassUsage")
-    BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-    Graphics2D g = bufferedImage.createGraphics();
+    var bufferedImage = new BufferedImage(
+      image.getWidth(null),
+      image.getHeight(null),
+      BufferedImage.TYPE_INT_ARGB
+    );
+    var g = bufferedImage.createGraphics();
     g.drawImage(image, 0, 0, null);
     g.dispose();
     return bufferedImage;
@@ -49,23 +56,37 @@ public class ImageUtil {
 
   public static int getRealWidth(@NotNull Image image) {
     if (image instanceof JBHiDPIScaledImage) {
-      Image img = ((JBHiDPIScaledImage)image).getDelegate();
-      if (img != null) image = img;
+      Image img = ((JBHiDPIScaledImage) image).getDelegate();
+
+      if (img != null) {
+        image = img;
+      }
     }
+
     return image.getWidth(null);
   }
 
   public static int getRealHeight(@NotNull Image image) {
     if (image instanceof JBHiDPIScaledImage) {
-      Image img = ((JBHiDPIScaledImage)image).getDelegate();
-      if (img != null) image = img;
+      Image img = ((JBHiDPIScaledImage) image).getDelegate();
+
+      if (img != null) {
+        image = img;
+      }
     }
+
     return image.getHeight(null);
   }
 
   public static Image filter(Image image, ImageFilter filter) {
-    if (image == null || filter == null) return image;
-    return Toolkit.getDefaultToolkit().createImage(
-      new FilteredImageSource(toBufferedImage(image).getSource(), filter));
+    if (image == null || filter == null) {
+      return image;
+    }
+
+    return Toolkit
+      .getDefaultToolkit()
+      .createImage(
+        new FilteredImageSource(toBufferedImage(image).getSource(), filter)
+      );
   }
 }

@@ -20,9 +20,6 @@ import com.bulenkov.iconloader.util.Ref;
 import com.bulenkov.iconloader.util.UIUtil;
 import junit.framework.TestCase;
 
-import javax.swing.*;
-import java.lang.reflect.Field;
-
 /**
  * @author Konstantin Bulenkov
  */
@@ -36,26 +33,35 @@ public abstract class IconLoaderTestCase extends TestCase {
       return;
     }
 
-    final Field ourRetina = UIUtil.class.getDeclaredField("ourRetina");
+    final var ourRetina = UIUtil.class.getDeclaredField("ourRetina");
     ourRetina.setAccessible(true);
     //noinspection unchecked
-    final Ref<Boolean> ref = (Ref<Boolean>)ourRetina.get(null);
+    final var ref = (Ref<Boolean>) ourRetina.get(null);
     ref.set(isRetina);
   }
 
-  public static void setDarkIcons(boolean dark) throws Exception {
+  public static void setDarkIcons(boolean dark) {
     IconLoader.setUseDarkIcons(dark);
   }
 
-  public void checkIcon(String path, boolean isRetina, boolean isDark, String expectedName) throws Exception {
+  public void checkIcon(
+    String path,
+    boolean isRetina,
+    boolean isDark,
+    String expectedName
+  ) throws Exception {
     setRetina(isRetina);
     setDarkIcons(isDark);
-    final Icon icon = IconLoader.getIcon(path);
+    final var icon = IconLoader.getIcon(path, IconLoaderTestCase.class);
     assert icon != null : "Can't find icon '" + path + "'";
     icon.getIconHeight();
 
-    final String realPath = ((IconLoader.CachedImageIcon) icon).myOriginalPath;
-    assert realPath != null && realPath.endsWith(expectedName) :
-        "Icon should be loaded from '" + expectedName + "' but it was loaded from '" + realPath + "'";
+    final var realPath = ((IconLoader.CachedImageIcon) icon).myOriginalPath;
+    assert realPath != null &&
+    realPath.endsWith(expectedName) : "Icon should be loaded from '" +
+    expectedName +
+    "' but it was loaded from '" +
+    realPath +
+    "'";
   }
 }

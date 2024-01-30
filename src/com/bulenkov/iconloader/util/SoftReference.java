@@ -16,10 +16,9 @@
 
 package com.bulenkov.iconloader.util;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The class is necessary to debug memory allocations via soft references. All IDEA classes should use this SoftReference
@@ -29,7 +28,10 @@ import java.lang.ref.ReferenceQueue;
  * @author max
  */
 @SuppressWarnings("ClassNameSameAsAncestorName")
-public class SoftReference<T> extends java.lang.ref.SoftReference<T> implements Getter<T> {
+public class SoftReference<T>
+  extends java.lang.ref.SoftReference<T>
+  implements Getter<T> {
+
   //private final T myReferent;
 
   public SoftReference(final T referent) {
@@ -42,15 +44,11 @@ public class SoftReference<T> extends java.lang.ref.SoftReference<T> implements 
     //myReferent = referent;
   }
 
-  //@Override
-  //public T get() {
-  //  return myReferent;
-  //}
-
   @Nullable
   public static <T> T dereference(@Nullable Reference<T> ref) {
     return ref == null ? null : ref.get();
   }
+
   @Nullable
   public static <T> T deref(@Nullable Getter<T> ref) {
     return ref == null ? null : ref.get();
