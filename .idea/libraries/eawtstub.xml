@@ -4,6 +4,8 @@
       <root url="jar://$PROJECT_DIR$/lib/eawtstub.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/eawtstub_src.zip!/main/java" />
+    </SOURCES>
   </library>
 </component>
